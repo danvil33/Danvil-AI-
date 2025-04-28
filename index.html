@@ -83,7 +83,7 @@
         }
 
         .header .logo-title {
-            height: 40px; /* Adjusted to fit header */
+            height: 40px;
             object-fit: contain;
             margin: 0 10px;
             vertical-align: middle;
@@ -415,6 +415,14 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-action i {
+            font-size: 16px;
+            color: #6e48aa;
         }
 
         .quick-action:hover {
@@ -716,7 +724,7 @@
             }
 
             .header .logo-title {
-                height: 32px; /* Smaller logo for mobile */
+                height: 32px;
             }
         }
     </style>
@@ -725,7 +733,7 @@
     <div id="particles-js"></div>
     <div class="loading-spinner" id="loading-spinner"></div>
     <div class="header">
-        <div class="logo" aria-label="Danvil Logo">DV</div>
+        <div class="logo" aria-label="Danvil Logo">beta1</div>
         <img src="https://raw.githubusercontent.com/danvil33/Danvil-AI-/refs/heads/main/IMG-20250427-WA0027.jpg" alt="Danvil AI Logo" class="logo-title" aria-label="Danvil AI Logo">
         <div class="icons" aria-label="Header navigation">
             <i class="fas fa-history" id="history-btn" title="Chat History"></i>
@@ -738,11 +746,11 @@
         <p>Unlock a world of knowledge and creativity with Danvil’s advanced AI capabilities.</p>
 
         <div class="quick-actions">
-            <div class="quick-action">Write an email</div>
-            <div class="quick-action">Explain concept</div>
-            <div class="quick-action">Debug code</div>
-            <div class="quick-action">Summarize text</div>
-            <div class="quick-action">Generate image</div>
+            <div class="quick-action"><i class="fas fa-envelope"></i>Write an email</div>
+            <div class="quick-action"><i class="fas fa-lightbulb"></i>Explain concept</div>
+            <div class="quick-action"><i class="fas fa-code"></i>Debug code</div>
+            <div class="quick-action"><i class="fas fa-file-alt"></i>Summarize text</div>
+            <div class="quick-action"><i class="fas fa-image"></i>Generate image</div>
         </div>
 
         <div class="features-container">
@@ -932,13 +940,13 @@
                 let response = '';
                 switch(action) {
                     case 'DanvilSearch':
-                        response = `### DanvilSearch Activated\n\nEnter your query to explore comprehensive answers powered by AI.`;
+                        response = `### DanvilSearch\n\nEnter a query for precise answers.`;
                         break;
                     case 'Think':
-                        response = `### Think Mode Enabled\n\nReady to solve complex problems with detailed reasoning. Try asking for:\n- Mathematical solutions\n- Scientific explanations\n- Code analysis`;
+                        response = `### Think Mode\n\nAsk for:\n- Math solutions\n- Science explanations\n- Code analysis`;
                         break;
                     case 'Work submission':
-                        response = `### Task Automation Ready\n\nSubmit your task details, requirements, and deadline. Danvil will process and deliver results efficiently.`;
+                        response = `### Task Automation\n\nSubmit task details for efficient processing.`;
                         break;
                 }
 
@@ -949,7 +957,7 @@
         // Quick actions interaction
         document.querySelectorAll('.quick-action').forEach(action => {
             action.addEventListener('click', function() {
-                const text = this.textContent;
+                const text = this.textContent.trim();
                 userInput.placeholder = `Danvil: ${text}...`;
                 this.style.backgroundColor = '#6e48aa';
                 this.style.color = '#ffffff';
@@ -964,16 +972,16 @@
                         prompt = 'Compose a professional email about:';
                         break;
                     case 'explain concept':
-                        prompt = 'Explain this concept in simple terms:';
+                        prompt = 'Explain this concept simply:';
                         break;
                     case 'debug code':
-                        prompt = 'Help me debug this codebase:\n```\n[Your code here]\n```';
+                        prompt = 'Debug this code:\n```\n[Your code here]\n```';
                         break;
                     case 'summarize text':
-                        prompt = 'Summarize this text for me:';
+                        prompt = 'Summarize this text:';
                         break;
                     case 'generate image':
-                        prompt = 'Describe the image you want me to generate:';
+                        prompt = 'Describe an image to generate (note: not supported yet):';
                         break;
                 }
 
@@ -1074,7 +1082,7 @@
 
                 // Handle "who created you" queries
                 if (message.toLowerCase().includes('who created you') || message.toLowerCase().includes('who made you')) {
-                    response = `### About My Creator\n\nI am Danvil, created by Danvil, a talented student from MUST University. My purpose is to assist users with knowledge and creativity, built from scratch with passion and innovation.`;
+                    response = `### Creator\n\nI am Danvil, created by Danvil, a student at MUST University.`;
                 }
 
                 // Type out response with pause/resume functionality
@@ -1082,7 +1090,7 @@
             } catch (error) {
                 hideTypingIndicator();
                 hideLoadingSpinner();
-                addMessageToChat('Danvil', `### Error\n\nSomething went wrong: ${error.message}`, 'ai');
+                addMessageToChat('Danvil', `### Error\n\n${error.message}. Try again.`, 'ai');
             }
         }
 
@@ -1239,52 +1247,76 @@
             typeChar();
         }
 
-        // Function to generate AI response using AIML API
+        // Function to generate AI response using Google Gemini API
         async function generateAIResponse(prompt) {
             if (prompt.length > 1000) {
-                return `### Processing Long Input\n\nYour input is quite detailed! Here's a summary:\n\n${prompt.substring(0, 500)}...\n\nPlease specify a key aspect to focus on or shorten your query for a detailed response.`;
+                return `### Too Long\n\nInput exceeds 1000 characters. Shorten it or focus on a key aspect.`;
             }
 
             const cacheKey = `ai_${prompt}_${currentModel}`;
             if (cache.has(cacheKey)) {
+                console.log('Returning cached response for:', cacheKey);
                 return cache.get(cacheKey);
             }
 
             try {
-                const response = await fetch('https://api.aimlapi.com/v1/chat/completions', {
+                const geminiModel = 'gemini-1.5-flash';
+                console.log('Sending request to Gemini API with model:', geminiModel, 'Prompt:', prompt);
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=AIzaSyD-WJmxHIkKApO6RPi-_y9kjIF-CkbIqCw`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer b86e6369d8a3444e92654b083932b696'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4o',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'You are Danvil, an advanced AI assistant created by Danvil, a student from MUST University. Provide detailed, accurate, and engaging responses in markdown format. Use headers, lists, and code blocks where appropriate. Do not mention Open AI or any other AI providers in your responses.'
-                            },
+                        contents: [
                             {
                                 role: 'user',
-                                content: prompt
+                                parts: [
+                                    {
+                                        text: `You are Danvil, an AI assistant created by Danvil, a student from MUST University. Provide short, clear, and accurate responses in markdown format. Use headers, lists, and code blocks where appropriate. Do not mention Google or other AI providers. User prompt: ${prompt}`
+                                    }
+                                ]
                             }
-                        ]
+                        ],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 500
+                        }
                     })
                 });
 
+                console.log('Received response from Gemini API:', response);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+                    const errorData = await response.json();
+                    console.error('Gemini API error:', errorData);
+                    throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.error?.message || 'Unknown error'}`);
                 }
 
                 const data = await response.json();
-                const aiResponse = data.choices[0].message.content;
+                console.log('Parsed API response:', data);
+
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
+                    throw new Error(`Prompt blocked: ${data.promptFeedback.blockReason}`);
+                }
+
+                if (!data.candidates || data.candidates.length === 0) {
+                    throw new Error('No response from API.');
+                }
+
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                console.log('Extracted AI response:', aiResponse);
 
                 cache.set(cacheKey, aiResponse);
                 return aiResponse;
 
             } catch (error) {
-                console.error('AIML API error:', error);
-                throw new Error('Failed to fetch response from AI. Please try again later.');
+                console.error('Error in generateAIResponse:', error);
+                if (error.message.includes('NetworkError') || error.message.includes('CORS')) {
+                    throw new Error('Network error: API request blocked, possibly due to CORS. Use a server-side proxy for production.');
+                }
+                throw error;
             }
         }
 
@@ -1302,7 +1334,7 @@
         // Microphone input
         micBtn.addEventListener('click', () => {
             if (!('webkitSpeechRecognition' in window)) {
-                alert('Speech recognition is not supported. Try a modern browser like Chrome.');
+                alert('Speech recognition not supported. Use Chrome.');
                 return;
             }
 
@@ -1324,7 +1356,7 @@
             recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
                 micBtn.style.color = '';
-                alert('Speech recognition failed. Please try again.');
+                alert('Speech recognition failed. Try again.');
             };
 
             recognition.onend = () => {
