@@ -1,1 +1,114 @@
-we understand why you need us 🙏
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danvil AI Assistant</title>
+    <!-- Include Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Include Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Include Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!-- Link external CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-title">New Chat</div>
+        <div class="icons" aria-label="Header navigation">
+            <i class="fas fa-history" id="history-btn" title="Chat History"></i>
+            <i class="fas fa-cog" id="settings-btn" title="Settings"></i>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="welcome-message">
+            <img src="https://raw.githubusercontent.com/danvil33/Danvil-AI-/refs/heads/main/images%20(9).jpeg" alt="Danvil AI Logo" class="logo">
+            <h2>Hi, I'm Danvil.</h2>
+            <p>How can I help you today?</p>
+        </div>
+        <div class="results-container"></div>
+    </div>
+
+    <div class="input-container">
+        <div class="model-selector" id="model-selector">
+            <div class="model-option" data-model="danvil-pro">
+                <i class="fas fa-brain"></i>
+                <div>
+                    <div class="model-name">Danvil Pro (R1)</div>
+                    <div class="model-desc">Advanced reasoning</div>
+                </div>
+            </div>
+            <div class="model-option" data-model="danvil-fast">
+                <i class="fas fa-globe"></i>
+                <div>
+                    <div class="model-name">Search</div>
+                    <div class="model-desc">Web search enabled</div>
+                </div>
+            </div>
+            <div class="model-option" data-model="danvil-claude">
+                <i class="fas fa-plus"></i>
+                <div>
+                    <div class="model-name">More Options</div>
+                    <div class="model-desc">Additional features</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <textarea id="user-input" placeholder="Message Danvil..." aria-label="Message Danvil" maxlength="1000"></textarea>
+            <div class="icons">
+                <i class="fas fa-microphone" id="mic-btn" title="Voice input"></i>
+                <i class="fas fa-brain" id="model-btn" title="Select Mode"></i>
+                <i class="fas fa-arrow-up send-btn" id="send-btn" title="Send"></i>
+            </div>
+        </div>
+        <div class="error-message" id="error-message">Input is too long (max 1000 characters).</div>
+    </div>
+
+    <div class="chat-history" id="chat-history">
+        <div class="chat-history-header">
+            <h3>Chat History</h3>
+            <i class="fas fa-times chat-history-close" id="history-close"></i>
+        </div>
+        <div class="history-items"></div>
+    </div>
+
+    <div class="settings-panel" id="settings-panel">
+        <div class="settings-header">
+            <h3>Settings</h3>
+            <i class="fas fa-times settings-close" id="settings-close"></i>
+        </div>
+
+        <div class="settings-option">
+            <span>Voice Responses</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="voice-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="settings-option">
+            <span>Auto-scroll</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="scroll-toggle" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="settings-option">
+            <span>Clear Chat History</span>
+            <button id="clear-history" style="background: none; border: none; color: #ff4757; cursor: pointer;">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="loading-spinner" id="loading-spinner"></div>
+
+    <!-- Link external JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
